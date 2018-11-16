@@ -16,7 +16,6 @@ def create_label_dict(s):
     s = s.split("\\label{")
     l = len(s)
     for i in range(1, l):
-        print(i)
         ref = s[i].split("}")[0]
         refs[i] = ref
     return refs
@@ -49,10 +48,10 @@ def nth_repl_all(s, sub, repl, nth):
 def replace_math(s): 
     s=nth_repl_all(s, "$", "\) ", 2)
     s=nth_repl_all(s, "$", " \(", 1)
-    s=s.replace("\\begin{align}"," \(")
-    s=s.replace("\\end{align}","\) ")
-    s=s.replace("\\begin{align*}"," \(")
-    s=s.replace("\\end{align*}","\) ")
+    s=s.replace("\\begin{align}"," \\begin{equation} ")
+    s=s.replace("\\end{align}","\\end{equation} ")
+    s=s.replace("\\begin{align*}"," \\begin{equation}")
+    s=s.replace("\\end{align*}","\\end{equation} ")
     s=s.replace("&", "") # removes &-alignments
     s=s.replace("\\\\", "") # removes line-breaks
     return s
@@ -94,11 +93,14 @@ start = file_contents.split('begin{task}')
 header = start[0]
 
 exercisename = getheader(header, "exercisename")
-topic = getheader(header, "exercisename")
+exercisename = replace_math(exercisename)
+topic = getheader(header, "topic")
+topic = replace_math(topic)
 exsubject = getheader(header, "exsubject")
 extype = getheader(header, "type")
 level = getheader(header, "level")
 keywords = getheader(header, "keywords")
+keywords = replace_math(keywords)
 keywords = keywords.split("{")[1]
 
 
@@ -136,7 +138,6 @@ secondlevelhints=step_5[0]
 secondlevelhints = replace_math(secondlevelhints)
 second_hints, second_subhints = divide_elements(secondlevelhints)
 
-
 #=========== get control results ===========
 step_6=step_5[1].split('begin{controlresults}')
 step_7=step_6[1].split('\end{controlresults}')
@@ -144,6 +145,12 @@ controlresults=step_7[0]
 
 controlresults = replace_math(controlresults)
 result, subresults = divide_elements(controlresults)
+
+for item in step_5[1].split("\n"):
+    if "begin{controlresults}" in item:
+        if item.strip()[0]=='%':
+            result=[""]
+            subresults=[""]
 
 
 #===========get solution ===========
@@ -191,11 +198,11 @@ def controlresult(s,item=""):
 
 # add main taks
 task(tasks[0])
-if(first_hints[0]!=""):
+if(first_hints[0].strip()):
     hint1(first_hints[0])
-if(second_hints[0]!=""):  
+if(second_hints[0].strip()):  
     hint2(second_hints[0])
-if(result[0]!=""):  
+if(result[0].strip()):  
     controlresult(result[0])
 
 # add subtasks
