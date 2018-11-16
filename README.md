@@ -1,4 +1,4 @@
-# ithephy_parser
+# iTHEPHY parser
 
 This script parses the iTHEPHY tex-templates for exercises and creates html files to be used for the implementation of exercises in moodle.
 
